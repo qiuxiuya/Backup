@@ -17,7 +17,7 @@ jobs:
         uses: robinraju/release-downloader@v1.8
         with:
           repository: AlistGo/alist
-          tag: v3.39.4
+          tag: v3.40.0
           out-file-path: alist/
           extract: false
 
