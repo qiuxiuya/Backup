@@ -1,0 +1,9 @@
+d41d8cd98f00b204e9800998ecf8427e  ./md5-linux-musl.txt
+9bfbca4128899bea71e58bec041f4bf1  ./alist-linux-musl-ppc64le.tar.gz
+670e4eda944d151a2a2d8226e2cb15a3  ./alist-linux-musl-mips.tar.gz
+0f204199756992d16e395dda389cfaba  ./alist-linux-musl-mips64le.tar.gz
+46edf4040797124c30c4eb4d64bbbfad  ./alist-linux-musl-s390x.tar.gz
+1cd46e69af164cddaf69a5635b6be78b  ./alist-linux-musl-mips64.tar.gz
+defcb237ac664389a67cbc4ddf4bbe2a  ./alist-linux-musl-arm64.tar.gz
+e30973af979bb0f2153bc54a65a46ef5  ./alist-linux-musl-amd64.tar.gz
+aeb7ad9b23f4f1c5018eb07e10889326  ./alist-linux-musl-mipsle.tar.gz

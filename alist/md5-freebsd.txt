@@ -1,0 +1,4 @@
+74e8799e2808e513312a9379cd7ac7aa  ./alist-freebsd-amd64.tar.gz
+c17faad3f36c262df3d586931c294c5a  ./alist-freebsd-arm64.tar.gz
+805aef46d76af6414d56c93eb95d1000  ./alist-freebsd-i386.tar.gz
+9740d466a5f6859b8d872b96cfe50902  ./md5-freebsd.txt
