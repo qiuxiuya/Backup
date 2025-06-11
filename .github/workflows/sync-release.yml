@@ -26,5 +26,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add alist/
-          git commit -m "Add Alist v3.39.4 release files to main/alist" || echo "No changes to commit"
+          git commit -m " "
           git push origin main
