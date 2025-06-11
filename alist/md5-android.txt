@@ -1,5 +1,0 @@
-7428d5ae2e7c52bf58cb015f28bb1175  ./alist-android-arm64.tar.gz
-b09a9ac8974f189ffc55c2d75290e0a3  ./md5-android.txt
-2bca9e90f5abbb10652443a8d532dc7e  ./alist-android-amd64.tar.gz
-49cf96aef1f76355bf2831ef9f3d6861  ./alist-android-arm.tar.gz
-606cf28da8c3a9cb494ee88b30599b73  ./alist-android-386.tar.gz
