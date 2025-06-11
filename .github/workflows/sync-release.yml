@@ -1,7 +1,7 @@
 name: Push Alist v3.39.4 to main/alist
 
 on:
-  workflow_dispatch:  # 手动触发
+  workflow_dispatch:
 
 jobs:
   download-and-push:
@@ -13,7 +13,7 @@ jobs:
         with:
           ref: main
 
-      - name: Download Alist v3.39.4 release assets
+      - name: download
         uses: robinraju/release-downloader@v1.8
         with:
           repository: AlistGo/alist
@@ -21,10 +21,10 @@ jobs:
           out-file-path: alist/
           extract: false
 
-      - name: Commit and push to main branch
+      - name: push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add alist/
-          git commit -m " "
+          git commit --allow-empty-message -m ""
           git push origin main
