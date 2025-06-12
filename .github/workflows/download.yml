@@ -1,4 +1,4 @@
-name: Download and Upload forwordpanel
+name: Download and Upload forwordpanel via LFS
 
 on:
   workflow_dispatch:
@@ -10,16 +10,28 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v3
+      with:
+        lfs: true  # 支持 LFS 文件
+
+    - name: Install Git LFS
+      run: |
+        sudo apt-get update
+        sudo apt-get install git-lfs
+        git lfs install
 
     - name: Download TAR File
       run: |
         mkdir -p xdpanel
         curl -L -o xdpanel/forwordpanel-1.0.7.tar http://tutu.ovh/iso/dockerimage/xdpanel/forwordpanel-1.0.7.tar
 
-    - name: Commit and Push File
+    - name: Track with Git LFS
+      run: |
+        git lfs track "xdpanel/forwordpanel-1.0.7.tar"
+        git add .gitattributes xdpanel/forwordpanel-1.0.7.tar
+
+    - name: Commit and Push with LFS
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
-        git add xdpanel/forwordpanel-1.0.7.tar
-        git commit -m "Add forwordpanel-1.0.7.tar to xdpanel"
+        git commit -m "Add large file with Git LFS"
         git push
