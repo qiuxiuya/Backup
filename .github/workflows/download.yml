@@ -1,4 +1,4 @@
-name: Download and Upload forwordpanel via LFS
+name: Download and Upload File
 
 on:
   workflow_dispatch:
@@ -8,30 +8,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
+    - name: Checkout repository
       uses: actions/checkout@v3
-      with:
-        lfs: true  # 支持 LFS 文件
 
-    - name: Install Git LFS
+    - name: Download
       run: |
-        sudo apt-get update
-        sudo apt-get install git-lfs
-        git lfs install
+        wget https://gitee.com/lntls/reex/releases/download/v1.8.9/armeabi-v7a-release-v1.8.9.apk
+        wget https://gitee.com/lntls/reex/releases/download/v1.8.9/arm64-v8a-release-v1.8.9.apk
+        wget https://gitee.com/lntls/reex/releases/download/v1.8.9/x86_64-release-v1.8.9.apk
 
-    - name: Download TAR File
+    - name: Move
       run: |
-        mkdir -p xdpanel
-        curl -L -o xdpanel/forwordpanel-1.0.7.tar http://tutu.ovh/iso/dockerimage/xdpanel/forwordpanel-1.0.7.tar
+        mkdir -p Reex
+        mv armeabi-v7a-release-v1.8.9.apk Reex/
+        mv arm64-v8a-release-v1.8.9.apk Reex/
+        mv x86_64-release-v1.8.9.apk Reex/
 
-    - name: Track with Git LFS
+    - name: Push 
       run: |
-        git lfs track "xdpanel/forwordpanel-1.0.7.tar"
-        git add .gitattributes xdpanel/forwordpanel-1.0.7.tar
-
-    - name: Commit and Push with LFS
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        git commit -m "Add large file with Git LFS"
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add Reex/armeabi-v7a-release-v1.8.9.apk Reex/arm64-v8a-release-v1.8.9.apk Reex/x86_64-release-v1.8.9.apk
+        git commit -m "233"
         git push
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
