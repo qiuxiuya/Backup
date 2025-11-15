@@ -1,4 +1,4 @@
-name: Build Reala Linux
+name: Build Reala Static
 
 on:
   workflow_dispatch:
@@ -11,19 +11,24 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        target: [x86_64-unknown-linux-gnu, aarch64-unknown-linux-gnu]
+        target: [x86_64-unknown-linux-musl, aarch64-unknown-linux-musl]
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - run: |
           sudo apt-get update
+          sudo apt-get install -y musl-tools musl-dev
           sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
 
       - run: |
           mkdir -p .cargo
-          echo '[target.aarch64-unknown-linux-gnu]' > .cargo/config.toml
+          echo '[target.aarch64-unknown-linux-musl]' > .cargo/config.toml
           echo 'linker = "aarch64-linux-gnu-gcc"' >> .cargo/config.toml
+          echo '[target.x86_64-unknown-linux-musl]' >> .cargo/config.toml
+          echo 'linker = "musl-gcc"' >> .cargo/config.toml
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -33,9 +38,12 @@ jobs:
 
       - working-directory: reala-src
         run: |
-          if [ "${{ matrix.target }}" = "aarch64-unknown-linux-gnu" ]; then
+          if [ "${{ matrix.target }}" = "aarch64-unknown-linux-musl" ]; then
             export CC=aarch64-linux-gnu-gcc
             export CXX=aarch64-linux-gnu-g++
+          fi
+          if [ "${{ matrix.target }}" = "x86_64-unknown-linux-musl" ]; then
+            export CC=musl-gcc
           fi
           cargo build --release --target ${{ matrix.target }}
 
@@ -47,5 +55,5 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add reala
-          git commit -m "update reala binaries" || true
-          git push
+          git commit -m "update static binaries" || true
+          git push --force
