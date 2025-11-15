@@ -2,10 +2,9 @@ name: Build Reala Linux
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
 
-permissions: write-all
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -21,6 +20,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
 
+      - run: |
+          mkdir -p .cargo
+          echo '[target.aarch64-unknown-linux-gnu]' > .cargo/config.toml
+          echo 'linker = "aarch64-linux-gnu-gcc"' >> .cargo/config.toml
+
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
@@ -30,8 +34,8 @@ jobs:
       - working-directory: reala-src
         run: |
           if [ "${{ matrix.target }}" = "aarch64-unknown-linux-gnu" ]; then
-            export CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc
-            export CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++
+            export CC=aarch64-linux-gnu-gcc
+            export CXX=aarch64-linux-gnu-g++
           fi
           cargo build --release --target ${{ matrix.target }}
 
@@ -43,5 +47,5 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add reala
-          git commit -m "Add linux binaries for ${{ matrix.target }}" || true
+          git commit -m "update reala binaries" || true
           git push
