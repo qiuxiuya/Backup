@@ -1,35 +1,48 @@
-name: Download and Upload File
+name: Fetch qBittorrent-nox Release
 
 on:
   workflow_dispatch:
 
 jobs:
-  download-and-upload:
+  fetch-and-commit:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout main branch
+        uses: actions/checkout@v5
+        with:
+          ref: main
 
-    - name: Download
-      run: |
-        wget https://gitee.com/lntls/reex/releases/download/v1.8.9/armeabi-v7a-release-v1.8.9.apk
-        wget https://gitee.com/lntls/reex/releases/download/v1.8.9/arm64-v8a-release-v1.8.9.apk
-        wget https://gitee.com/lntls/reex/releases/download/v1.8.9/x86_64-release-v1.8.9.apk
+      - name: Prepare qbittorrent-nox directory
+        run: |
+          mkdir -p qbittorrent-nox
+          rm -rf qbittorrent-nox/*
 
-    - name: Move
-      run: |
-        mkdir -p Reex
-        mv armeabi-v7a-release-v1.8.9.apk Reex/
-        mv arm64-v8a-release-v1.8.9.apk Reex/
-        mv x86_64-release-v1.8.9.apk Reex/
+      - name: Download all assets from release 4.6.7_v2.0.10
+        env:
+          RELEASE_TAG: release-4.6.7_v2.0.10
+          OWNER: userdocs
+          REPO: qbittorrent-nox-static
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          sudo apt-get update && sudo apt-get install -y jq curl
+          api="https://api.github.com/repos/$OWNER/$REPO/releases/tags/$RELEASE_TAG"
+          assets=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "$api" | jq -r '.assets[].browser_download_url')
+          if [ -z "$assets" ]; then
+            echo "No assets found for release $RELEASE_TAG"
+            exit 1
+          fi
+          for url in $assets; do
+            echo "Downloading $url"
+            fname=$(basename "$url")
+            curl -L -H "Authorization: Bearer $GITHUB_TOKEN" -o "qbittorrent-nox/$fname" "$url"
+          done
 
-    - name: Push 
-      run: |
-        git config --global user.name "github-actions[bot]"
-        git config --global user.email "github-actions[bot]@users.noreply.github.com"
-        git add Reex/armeabi-v7a-release-v1.8.9.apk Reex/arm64-v8a-release-v1.8.9.apk Reex/x86_64-release-v1.8.9.apk
-        git commit -m "233"
-        git push
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Commit and push updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add qbittorrent-nox
+          git commit -m "Update qBittorrent-nox release ${RELEASE_TAG}" || echo "No changes to commit"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
