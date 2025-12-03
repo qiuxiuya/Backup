@@ -1,0 +1,63 @@
+name: Sync OpenList Releases daily
+
+on:
+  schedule:
+    # 每天 16:00 UTC ≈ 本地 8:00（如果你在 UTC-8 时区，如 PST）
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+
+jobs:
+  fetch-and-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v5
+        with:
+          ref: main
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq curl
+
+      - name: Download all releases
+        env:
+          OWNER: OpenListTeam
+          REPO: OpenList
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # 获取所有 release tags
+          releases=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+            "https://api.github.com/repos/$OWNER/$REPO/releases" | jq -r '.[] | .tag_name')
+          if [ -z "$releases" ]; then
+            echo "No releases found"
+            exit 1
+          fi
+
+          for tag in $releases; do
+            dir="openlist/$tag"
+            mkdir -p "$dir"
+            # 获取该 release 的所有 assets 下载链接
+            assets=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+              "https://api.github.com/repos/$OWNER/$REPO/releases/tags/$tag" \
+              | jq -r '.assets[].browser_download_url')
+            for url in $assets; do
+              fname=$(basename "$url")
+              if [ ! -f "$dir/$fname" ]; then
+                echo "Downloading $tag -> $fname"
+                curl -L -H "Authorization: Bearer $GITHUB_TOKEN" -o "$dir/$fname" "$url"
+              else
+                echo "$tag -> $fname already exists, skipping"
+              fi
+            done
+          done
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add openlist
+          git commit -m "Sync OpenList releases $(date +'%Y-%m-%d')" || echo "No changes to commit"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
