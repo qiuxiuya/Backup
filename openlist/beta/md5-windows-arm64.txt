@@ -1,0 +1,2 @@
+d41d8cd98f00b204e9800998ecf8427e  ./md5-windows-arm64.txt
+5dddef2aa5a5298b73ade768c30aa52f  ./openlist-windows-arm64.zip
