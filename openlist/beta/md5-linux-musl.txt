@@ -1,0 +1,11 @@
+1bad4af924a0c47d1f23a6de678bdaf0  ./openlist-linux-musl-mips64le.tar.gz
+28cfdf9d34796f48469d06b75cbc948b  ./md5-linux-musl.txt
+5066b519cc2584aa65c95f0535cf93bd  ./openlist-linux-musl-riscv64.tar.gz
+13d05328d91d71c8f9ae26a8d41dba81  ./openlist-linux-musl-loong64.tar.gz
+98e236f96e24c03eb605e124464ea9db  ./openlist-linux-musl-ppc64le.tar.gz
+ff02a4e7937075904f2d7e35e9c99d04  ./openlist-linux-musl-s390x.tar.gz
+984a1103fd02363e246f955ffb1fddc6  ./openlist-linux-musl-amd64.tar.gz
+5fe61c35da70720b199d852fdbd635eb  ./openlist-linux-musl-mipsle.tar.gz
+a4c6b5f8e9d945863891c4d4911e63aa  ./openlist-linux-musl-mips64.tar.gz
+9090aba3b592a9e72762700330545462  ./openlist-linux-musl-mips.tar.gz
+810b5d1cc6cb769c42d4fb93ecc3230f  ./openlist-linux-musl-386.tar.gz
