@@ -1,3 +1,0 @@
-d41d8cd98f00b204e9800998ecf8427e  ./md5-windows7.txt
-420e33886faefaf65a27e5b8cf27bd8b  ./openlist-windows7-amd64.zip
-49644de61fb889a7855286b363386db4  ./openlist-windows7-386.zip
