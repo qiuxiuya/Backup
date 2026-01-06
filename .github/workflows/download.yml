@@ -7,18 +7,15 @@ jobs:
   fetch-and-commit:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout main branch
-        uses: actions/checkout@v5
+      - uses: actions/checkout@v5
         with:
           ref: main
 
-      - name: Prepare frp directory
-        run: |
+      - run: |
           mkdir -p frp
           rm -rf frp/*
 
-      - name: Download all assets from release v0.66.0
-        env:
+      - env:
           RELEASE_TAG: v0.66.0
           OWNER: fatedier
           REPO: frp
@@ -27,34 +24,16 @@ jobs:
           sudo apt-get update && sudo apt-get install -y jq curl
           api="https://api.github.com/repos/$OWNER/$REPO/releases/tags/$RELEASE_TAG"
           assets=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "$api" | jq -r '.assets[].browser_download_url')
-          if [ -z "$assets" ]; then
-            echo "No assets found for release $RELEASE_TAG"
-            exit 1
-          fi
+          [ -z "$assets" ] && exit 1
           for url in $assets; do
-            echo "Downloading $url"
-            fname=$(basename "$url")
-            curl -L -H "Authorization: Bearer $GITHUB_TOKEN" -o "frp/$fname" "$url"
+            curl -L -H "Authorization: Bearer $GITHUB_TOKEN" -o "frp/$(basename "$url")" "$url"
           done
 
-      - name: Commit and push updates
+      - env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name github-actions[bot]
+          git config user.email github-actions[bot]@users.noreply.github.com
           git add frp
-          git commit -m "Update frp release v0.66.0" || echo "No changes to commit"
+          git commit -m "Update frp v0.66.0" || exit 0
           git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            curl -L -H "Authorization: Bearer $GITHUB_TOKEN" -o "qbittorrent-nox/$fname" "$url"
-          done
-
-      - name: Commit and push updates
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add qbittorrent-nox
-          git commit -m "Update qBittorrent-nox release ${RELEASE_TAG}" || echo "No changes to commit"
-          git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
