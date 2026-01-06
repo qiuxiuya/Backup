@@ -1,4 +1,4 @@
-name: Fetch qBittorrent-nox Release
+name: Fetch frp Release
 
 on:
   workflow_dispatch:
@@ -12,16 +12,16 @@ jobs:
         with:
           ref: main
 
-      - name: Prepare qbittorrent-nox directory
+      - name: Prepare frp directory
         run: |
-          mkdir -p qbittorrent-nox
-          rm -rf qbittorrent-nox/*
+          mkdir -p frp
+          rm -rf frp/*
 
-      - name: Download all assets from release 4.6.7_v2.0.10
+      - name: Download all assets from release v0.66.0
         env:
-          RELEASE_TAG: release-4.6.7_v2.0.10
-          OWNER: userdocs
-          REPO: qbittorrent-nox-static
+          RELEASE_TAG: v0.66.0
+          OWNER: fatedier
+          REPO: frp
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           sudo apt-get update && sudo apt-get install -y jq curl
@@ -34,6 +34,18 @@ jobs:
           for url in $assets; do
             echo "Downloading $url"
             fname=$(basename "$url")
+            curl -L -H "Authorization: Bearer $GITHUB_TOKEN" -o "frp/$fname" "$url"
+          done
+
+      - name: Commit and push updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add frp
+          git commit -m "Update frp release v0.66.0" || echo "No changes to commit"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             curl -L -H "Authorization: Bearer $GITHUB_TOKEN" -o "qbittorrent-nox/$fname" "$url"
           done
 
