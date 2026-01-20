@@ -21,7 +21,6 @@ jobs:
               owner: 'MetaCubeX',
               repo: 'mihomo'
             });
-            // 输出所有 assets 的 name 和下载链接
             const assets = release.data.assets.map(a => ({name: a.name, url: a.browser_download_url}));
             return JSON.stringify(assets);
           result-encoding: string
@@ -45,22 +44,30 @@ jobs:
       - name: Download assets
         run: |
           while read url; do
-            wget -P mihomo "$url"
+            wget -nc -P mihomo "$url"  # -nc 避免重复下载
           done < download_urls.txt
 
       - name: Rename files to remove version
         run: |
           for f in mihomo/*.gz; do
             new_name=$(echo "$f" | sed -E 's/-v[0-9]+\.[0-9]+\.[0-9]+//')
-            mv "$f" "$new_name"
+            if [ "$f" != "$new_name" ]; then
+              mv "$f" "$new_name"
+            fi
           done
 
-      - name: Commit and push
+      - name: Commit and push safely
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
           git add mihomo
-          git commit -m "mihomo releases"
+
+          git commit -m "Update mihomo releases" || echo "No changes to commit"
+
+          git fetch origin main
+          git reset --soft origin/main
+
           git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
