@@ -32,8 +32,8 @@ jobs:
           
           # 定义需要下载的文件模式和重命名规则
           declare -A FILE_MAP=(
-            ["windows-amd64-compatible"]="mihomo-windows-amd64.gz"
-            ["windows-arm64"]="mihomo-windows-arm64.gz"
+            ["windows-amd64-compatible"]="mihomo-windows-amd64.zip"
+            ["windows-arm64"]="mihomo-windows-arm64.zip"
             ["linux-amd64-compatible"]="mihomo-linux-amd64.gz"
             ["linux-arm64"]="mihomo-linux-arm64.gz"
             ["linux-armv7"]="mihomo-linux-armv7.gz"
@@ -44,7 +44,13 @@ jobs:
           
           # 遍历文件映射并下载重命名
           for pattern in "${!FILE_MAP[@]}"; do
-            url=$(grep "${pattern}" urls.txt | grep "\.gz$" | head -1)
+            # 根据目标文件扩展名确定要搜索的文件类型
+            if [[ "${FILE_MAP[$pattern]}" == *.zip ]]; then
+              url=$(grep "${pattern}" urls.txt | grep "\.zip$" | head -1)
+            else
+              url=$(grep "${pattern}" urls.txt | grep "\.gz$" | head -1)
+            fi
+            
             if [ ! -z "$url" ]; then
               echo "Downloading: $url"
               wget -q "$url" -O "mihomo/${FILE_MAP[$pattern]}"
