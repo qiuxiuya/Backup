@@ -30,14 +30,17 @@ jobs:
         run: |
           mkdir -p mihomo
           echo '${{ steps.release.outputs.result }}' > assets.json
-          # 指定平台关键字
+
           platforms=("windows-amd64-compatible" "windows-arm64" "amd64-compatible" "linux-arm64" "linux-armv7" "android-arm64" "android-armv7" "android-amd64")
           > download_urls.txt
+
+          # 根据平台关键字筛选下载链接
           for p in "${platforms[@]}"; do
             jq -r ".[] | select(.name | test(\"$p\")) | .url" assets.json >> download_urls.txt
           done
-          # 额外下载固定文件
-          jq -r '.[] | select(.name=="mihomo-linux-amd64-compatible-v1.19.19.gz") | .url' assets.json >> download_urls.txt
+
+          # 自动获取最新版本的 mihomo-linux-amd64-compatible-*.gz
+          jq -r '.[] | select(.name | test("mihomo-linux-amd64-compatible-v[0-9]+\\.[0-9]+\\.[0-9]+\\.gz")) | .url' assets.json >> download_urls.txt
 
       - name: Download assets
         run: |
@@ -54,8 +57,10 @@ jobs:
 
       - name: Commit and push
         run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add mihomo
-          git commit -m "Update mihomo releases"
+          git commit -m "mihomo releases"
           git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
