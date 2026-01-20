@@ -1,0 +1,69 @@
+name: Download mihomo Releases
+
+on:
+  workflow_dispatch:
+
+jobs:
+  download-mihomo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Get latest release info
+        id: release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const release = await github.rest.repos.getLatestRelease({
+              owner: 'MetaCubeX',
+              repo: 'mihomo'
+            });
+            return release.data;
+
+      - name: Prepare download list
+        id: assets
+        run: |
+          platforms=("windows-amd64-compatible" "windows-arm64" "amd64-compatible" "linux-arm64" "linux-armv7" "android-arm64" "android-armv7" "android-amd64")
+          version=$(echo '${{ steps.release.outputs.result }}' | jq -r '.tag_name')
+          mkdir -p mihomo
+          echo "$version" > version.txt
+          for p in "${platforms[@]}"; do
+            url=$(echo '${{ steps.release.outputs.result }}' | jq -r ".assets[] | select(.name | test(\"$p\")) | .browser_download_url")
+            if [ ! -z "$url" ]; then
+              echo "$url" >> download_urls.txt
+            fi
+          done
+          # 添加固定文件
+          fixed_url=$(echo '${{ steps.release.outputs.result }}' | jq -r ".assets[] | select(.name == \"mihomo-linux-amd64-compatible-v1.19.19.gz\") | .browser_download_url")
+          if [ ! -z "$fixed_url" ]; then
+            echo "$fixed_url" >> download_urls.txt
+          fi
+
+      - name: Download assets
+        run: |
+          while read url; do
+            wget -P mihomo "$url"
+          done < download_urls.txt
+
+      - name: Rename files to remove version
+        run: |
+          for f in mihomo/*.gz; do
+            new_name=$(echo "$f" | sed -E 's/-v[0-9]+\.[0-9]+\.[0-9]+//')
+            mv "$f" "$new_name"
+          done
+
+      - name: Commit and push
+        run: |
+          git add mihomo
+          git commit -m "Update mihomo releases"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
