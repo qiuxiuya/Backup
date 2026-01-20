@@ -1,73 +1,85 @@
-name: Download mihomo Releases
+name: Download Mihomo Latest Release
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # 手动触发
+  schedule:
+    - cron: '0 2 * * *'  # 每天凌晨2点自动检查更新
 
 jobs:
-  download-mihomo:
+  download-and-rename:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout main branch
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           ref: main
-
-      - name: Get latest release assets
-        id: release
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const release = await github.rest.repos.getLatestRelease({
-              owner: 'MetaCubeX',
-              repo: 'mihomo'
-            });
-            const assets = release.data.assets.map(a => ({name: a.name, url: a.browser_download_url}));
-            return JSON.stringify(assets);
-          result-encoding: string
-
-      - name: Prepare download list
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Create mihomo directory
+        run: mkdir -p mihomo
+      
+      - name: Get latest release info
+        id: get_release
         run: |
-          mkdir -p mihomo
-          echo '${{ steps.release.outputs.result }}' > assets.json
-
-          platforms=("windows-amd64-compatible" "windows-arm64" "amd64-compatible" "linux-arm64" "linux-armv7" "android-arm64" "android-armv7" "android-amd64")
-          > download_urls.txt
-
-          # 根据平台关键字筛选下载链接
-          for p in "${platforms[@]}"; do
-            jq -r ".[] | select(.name | test(\"$p\")) | .url" assets.json >> download_urls.txt
-          done
-
-          # 自动获取最新版本的 mihomo-linux-amd64-compatible-*.gz
-          jq -r '.[] | select(.name | test("mihomo-linux-amd64-compatible-v[0-9]+\\.[0-9]+\\.[0-9]+\\.gz")) | .url' assets.json >> download_urls.txt
-
-      - name: Download assets
+          LATEST_RELEASE=$(curl -s https://api.github.com/repos/MetaCubeX/mihomo/releases/latest)
+          echo "tag_name=$(echo $LATEST_RELEASE | jq -r '.tag_name')" >> $GITHUB_OUTPUT
+          echo $LATEST_RELEASE | jq -r '.assets[].browser_download_url' > urls.txt
+      
+      - name: Download and rename files
         run: |
-          while read url; do
-            wget -nc -P mihomo "$url"  # -nc 避免重复下载
-          done < download_urls.txt
-
-      - name: Rename files to remove version
-        run: |
-          for f in mihomo/*.gz; do
-            new_name=$(echo "$f" | sed -E 's/-v[0-9]+\.[0-9]+\.[0-9]+//')
-            if [ "$f" != "$new_name" ]; then
-              mv "$f" "$new_name"
+          VERSION="${{ steps.get_release.outputs.tag_name }}"
+          
+          # 定义需要下载的文件模式和重命名规则
+          declare -A FILE_MAP=(
+            ["windows-amd64-compatible"]="mihomo-windows-amd64.gz"
+            ["windows-arm64"]="mihomo-windows-arm64.gz"
+            ["linux-amd64-compatible"]="mihomo-linux-amd64.gz"
+            ["linux-arm64"]="mihomo-linux-arm64.gz"
+            ["linux-armv7"]="mihomo-linux-armv7.gz"
+            ["android-arm64"]="mihomo-android-arm64.gz"
+            ["android-armv7"]="mihomo-android-armv7.gz"
+            ["android-amd64"]="mihomo-android-amd64.gz"
+          )
+          
+          # 遍历文件映射并下载重命名
+          for pattern in "${!FILE_MAP[@]}"; do
+            url=$(grep "${pattern}" urls.txt | grep "\.gz$" | head -1)
+            if [ ! -z "$url" ]; then
+              echo "Downloading: $url"
+              wget -q "$url" -O "mihomo/${FILE_MAP[$pattern]}"
+              echo "✓ Downloaded and renamed to: ${FILE_MAP[$pattern]}"
+            else
+              echo "⚠ File matching pattern '$pattern' not found"
             fi
           done
-
-      - name: Commit and push safely
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+          # 清理临时文件
+          rm -f urls.txt
+      
+      - name: Check if files changed
+        id: check_changes
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git add mihomo
-
-          git commit -m "Update mihomo releases" || echo "No changes to commit"
-
-          git fetch origin main
-          git reset --soft origin/main
-
-          git push origin main
+          git add mihomo/
+          if git diff --staged --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Commit and push changes
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git commit -m "Update mihomo to ${{ steps.get_release.outputs.tag_name }}"
+          git push
+      
+      - name: Summary
+        run: |
+          echo "### Download Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ steps.get_release.outputs.tag_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Files downloaded:**" >> $GITHUB_STEP_SUMMARY
+          ls -lh mihomo/ >> $GITHUB_STEP_SUMMARY
