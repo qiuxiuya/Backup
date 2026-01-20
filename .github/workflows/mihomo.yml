@@ -12,12 +12,7 @@ jobs:
         with:
           ref: main
 
-      - name: Set up Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Get latest release info
+      - name: Get latest release assets
         id: release
         uses: actions/github-script@v7
         with:
@@ -26,26 +21,23 @@ jobs:
               owner: 'MetaCubeX',
               repo: 'mihomo'
             });
-            return release.data;
+            // 输出所有 assets 的 name 和下载链接
+            const assets = release.data.assets.map(a => ({name: a.name, url: a.browser_download_url}));
+            return JSON.stringify(assets);
+          result-encoding: string
 
       - name: Prepare download list
-        id: assets
         run: |
-          platforms=("windows-amd64-compatible" "windows-arm64" "amd64-compatible" "linux-arm64" "linux-armv7" "android-arm64" "android-armv7" "android-amd64")
-          version=$(echo '${{ steps.release.outputs.result }}' | jq -r '.tag_name')
           mkdir -p mihomo
-          echo "$version" > version.txt
+          echo '${{ steps.release.outputs.result }}' > assets.json
+          # 指定平台关键字
+          platforms=("windows-amd64-compatible" "windows-arm64" "amd64-compatible" "linux-arm64" "linux-armv7" "android-arm64" "android-armv7" "android-amd64")
+          > download_urls.txt
           for p in "${platforms[@]}"; do
-            url=$(echo '${{ steps.release.outputs.result }}' | jq -r ".assets[] | select(.name | test(\"$p\")) | .browser_download_url")
-            if [ ! -z "$url" ]; then
-              echo "$url" >> download_urls.txt
-            fi
+            jq -r ".[] | select(.name | test(\"$p\")) | .url" assets.json >> download_urls.txt
           done
-          # 添加固定文件
-          fixed_url=$(echo '${{ steps.release.outputs.result }}' | jq -r ".assets[] | select(.name == \"mihomo-linux-amd64-compatible-v1.19.19.gz\") | .browser_download_url")
-          if [ ! -z "$fixed_url" ]; then
-            echo "$fixed_url" >> download_urls.txt
-          fi
+          # 额外下载固定文件
+          jq -r '.[] | select(.name=="mihomo-linux-amd64-compatible-v1.19.19.gz") | .url' assets.json >> download_urls.txt
 
       - name: Download assets
         run: |
