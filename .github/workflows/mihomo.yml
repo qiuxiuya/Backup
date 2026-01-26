@@ -1,9 +1,9 @@
 name: Download Mihomo Latest Release
 
 on:
-  workflow_dispatch:  # 手动触发
+  workflow_dispatch:
   schedule:
-    - cron: '0 2 * * *'  # 每天凌晨2点自动检查更新
+    - cron: '0 2 * * *'
 
 jobs:
   download-and-rename:
@@ -29,8 +29,7 @@ jobs:
       - name: Download and rename files
         run: |
           VERSION="${{ steps.get_release.outputs.tag_name }}"
-          
-          # 定义需要下载的文件模式和重命名规则
+
           declare -A FILE_MAP=(
             ["windows-amd64-compatible"]="mihomo-windows-amd64.zip"
             ["windows-arm64"]="mihomo-windows-arm64.zip"
@@ -42,9 +41,13 @@ jobs:
             ["android-amd64"]="mihomo-android-amd64.gz"
           )
           
-          # 遍历文件映射并下载重命名
+          declare -A DEB_FILE_MAP=(
+            ["linux-amd64-v3"]="mihomo-linux-amd64.deb"
+            ["linux-arm64"]="mihomo-linux-arm64.deb"
+            ["linux-armv7"]="mihomo-linux-armv7.deb"
+          )
+
           for pattern in "${!FILE_MAP[@]}"; do
-            # 根据目标文件扩展名确定要搜索的文件类型
             if [[ "${FILE_MAP[$pattern]}" == *.zip ]]; then
               url=$(grep "${pattern}" urls.txt | grep "\.zip$" | head -1)
             else
@@ -59,8 +62,19 @@ jobs:
               echo "⚠ File matching pattern '$pattern' not found"
             fi
           done
-          
-          # 清理临时文件
+
+          for pattern in "${!DEB_FILE_MAP[@]}"; do
+            url=$(grep "${pattern}" urls.txt | grep "\.deb$" | head -1)
+            
+            if [ ! -z "$url" ]; then
+              echo "Downloading: $url"
+              wget -q "$url" -O "mihomo/${DEB_FILE_MAP[$pattern]}"
+              echo "✓ Downloaded and renamed to: ${DEB_FILE_MAP[$pattern]}"
+            else
+              echo "⚠ DEB file matching pattern '$pattern' not found"
+            fi
+          done
+
           rm -f urls.txt
       
       - name: Check if files changed
