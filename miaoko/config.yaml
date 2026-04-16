@@ -1,0 +1,948 @@
+superKeepers:
+keepers:
+nodes:
+nodesConfig: {}
+groupBindings: {}
+token: 
+telegramToken: 
+slaveConfig:
+    slaves:
+    default: 
+    defaultConn: 
+    skipDialog: false
+commands:
+    ai:
+        info: AI 服务可用性测试
+        emoji: "\U0001F916"
+        matrixTypes:
+            - TEST_PING_RTT
+            - TEST_PING_CONN
+            - TEST_SCRIPT::ChatGPT
+            - TEST_SCRIPT::Gemini
+            - TEST_SCRIPT::Claude
+            - TEST_SCRIPT::Copilot
+            - TEST_SCRIPT::Perplexity
+    alltest:
+        info: 全量服务测试
+        emoji: "\U0001F9EA"
+        matrixTypes:
+            - TEST_PING_RTT
+            - TEST_PING_CONN
+            - TEST_SCRIPT::Abema
+            - TEST_SCRIPT::动画疯
+            - TEST_SCRIPT::BiliBili
+            - TEST_SCRIPT::Dazn
+            - TEST_SCRIPT::Disney+
+            - TEST_SCRIPT::DNS
+            - TEST_SCRIPT::Espn+
+            - TEST_SCRIPT::HBOMax
+            - TEST_SCRIPT::IP类型
+            - TEST_SCRIPT::Netflix
+            - TEST_SCRIPT::Niconico
+            - TEST_SCRIPT::公主连结
+            - TEST_SCRIPT::Youtube
+            - TEST_SCRIPT::BiliBiliTV
+            - TEST_SCRIPT::iQiyi
+            - TEST_SCRIPT::PrimeVideo
+            - TEST_SCRIPT::TVBAnywhere
+            - TEST_SCRIPT::Viu
+            - TEST_SCRIPT::CatchPlay+
+            - TEST_SCRIPT::HamiVideo
+            - TEST_SCRIPT::HBOGoAisa
+            - TEST_SCRIPT::KKTV
+            - TEST_SCRIPT::LineTV
+            - TEST_SCRIPT::LiTV
+            - TEST_SCRIPT::MyTVSuper
+            - TEST_SCRIPT::MyVideo
+            - TEST_SCRIPT::NowE
+            - TEST_SCRIPT::DMM
+            - TEST_SCRIPT::FOD
+            - TEST_SCRIPT::HuluJP
+            - TEST_SCRIPT::J:COM.on.demand
+            - TEST_SCRIPT::舰队收藏
+            - TEST_SCRIPT::Karaoke
+            - TEST_SCRIPT::为美好的世界献上祝福
+            - TEST_SCRIPT::MusicJP
+            - TEST_SCRIPT::赛马娘
+            - TEST_SCRIPT::世界计划
+            - TEST_SCRIPT::Radiko
+            - TEST_SCRIPT::Telasa
+            - TEST_SCRIPT::TVer
+            - TEST_SCRIPT::UNext
+            - TEST_SCRIPT::CoupangPlay
+            - TEST_SCRIPT::KBSDomestic
+            - TEST_SCRIPT::Tving
+            - TEST_SCRIPT::Wavve
+            - TEST_SCRIPT::BritBox
+            - TEST_SCRIPT::Discovery+
+            - TEST_SCRIPT::EPIX
+            - TEST_SCRIPT::Fox
+            - TEST_SCRIPT::FuboTV
+            - TEST_SCRIPT::FXNOW
+            - TEST_SCRIPT::KBSAmerican
+            - TEST_SCRIPT::Max
+            - TEST_SCRIPT::Paramount+
+            - TEST_SCRIPT::PeacockTV
+            - TEST_SCRIPT::PlutoTV
+            - TEST_SCRIPT::Shudder
+            - TEST_SCRIPT::SlingTV
+            - TEST_SCRIPT::Star+
+            - TEST_SCRIPT::STARZ
+            - TEST_SCRIPT::TLCGO
+            - TEST_SCRIPT::Biguz
+            - TEST_SCRIPT::Claude
+            - TEST_SCRIPT::Copilot
+            - TEST_SCRIPT::E-Hentai
+            - TEST_SCRIPT::Gemini
+            - TEST_SCRIPT::Hanime1
+            - TEST_SCRIPT::InstagramMusic
+            - TEST_SCRIPT::IP风险
+            - TEST_SCRIPT::IP类型
+            - TEST_SCRIPT::ChatGPT
+            - TEST_SCRIPT::Perplexity
+            - TEST_SCRIPT::Reddit
+            - TEST_SCRIPT::SpeedTest
+            - TEST_SCRIPT::Spotify
+            - TEST_SCRIPT::SSH
+            - TEST_SCRIPT::Steam
+            - TEST_SCRIPT::Telegram延迟
+            - TEST_SCRIPT::Tiktok
+            - TEST_SCRIPT::维基百科
+            - TEST_SCRIPT::维基百科(中文)
+    geoip:
+        info: 出入口信息检测
+        emoji: "\U0001F30D"
+        matrixTypes:
+            - GEOIP_INBOUND
+            - GEOIP_OUTBOUND::ASN
+            - GEOIP_OUTBOUND::SUBNET::20
+            - GEOIP_OUTBOUND::ISP
+            - GEOIP_OUTBOUND::COUNTRY
+            - GEOIP_OUTBOUND::CONTINENT
+        allowNormalUsers: true
+    hmt:
+        info: 港澳台流媒体测试
+        emoji: "\U0001F1ED\U0001F1F0"
+        matrixTypes:
+            - TEST_PING_RTT
+            - TEST_PING_CONN
+            - TEST_SCRIPT::动画疯
+            - TEST_SCRIPT::BiliBili
+            - TEST_SCRIPT::MyTVSuper
+            - TEST_SCRIPT::NowE
+            - TEST_SCRIPT::KKTV
+            - TEST_SCRIPT::LineTV
+            - TEST_SCRIPT::HamiVideo
+    iprisk:
+        info: 网络基础及风险测试
+        emoji: "\U0001F310"
+        matrixTypes:
+            - TEST_PING_RTT
+            - TEST_PING_CONN
+            - TEST_SCRIPT::DNS
+            - TEST_SCRIPT::IP类型
+            - TEST_SCRIPT::IP风险
+            - TEST_SCRIPT::IP类型
+            - TEST_SCRIPT::SpeedTest
+    jp:
+        info: 日本流媒体测试
+        emoji: "\U0001F1EF\U0001F1F5"
+        matrixTypes:
+            - TEST_PING_RTT
+            - TEST_PING_CONN
+            - TEST_SCRIPT::Abema
+            - TEST_SCRIPT::DMM
+            - TEST_SCRIPT::Niconico
+            - TEST_SCRIPT::HuluJP
+            - TEST_SCRIPT::UNext
+            - TEST_SCRIPT::TVer
+            - TEST_SCRIPT::Radiko
+    kr:
+        info: 韩国流媒体测试
+        emoji: "\U0001F1F0\U0001F1F7"
+        matrixTypes:
+            - TEST_PING_RTT
+            - TEST_PING_CONN
+            - TEST_SCRIPT::Wavve
+            - TEST_SCRIPT::Tving
+            - TEST_SCRIPT::CoupangPlay
+            - TEST_SCRIPT::KBSDomestic
+    speed:
+        info: 速度测试
+        emoji: "\U0001F680"
+        matrixTypes:
+            - TEST_PING_RTT
+            - TEST_PING_CONN
+            - SPEED_AVERAGE
+            - SPEED_MAX
+            - SPEED_PER_SECOND
+            - UDP_TYPE
+        realtime: true
+        sortBy: Original
+    test:
+        info: 常用流媒体测试
+        emoji: "\U0001F4FA"
+        matrixTypes:
+            - TEST_PING_RTT
+            - TEST_PING_CONN
+            - TEST_SCRIPT::Youtube
+            - TEST_SCRIPT::Netflix
+            - TEST_SCRIPT::Disney+
+            - TEST_SCRIPT::PrimeVideo
+            - TEST_SCRIPT::HBOMax
+    udp:
+        info: udp类型测试
+        emoji: "\U0001F517"
+        matrixTypes:
+            - UDP_TYPE
+        sortBy: Original
+    us:
+        info: 美国流媒体检测
+        emoji: "\U0001F30D"
+        matrixTypes:
+            - TEST_PING_RTT
+            - TEST_PING_CONN
+            - TEST_SCRIPT::BritBox
+            - TEST_SCRIPT::EPIX
+            - TEST_SCRIPT::FXNOW
+            - TEST_SCRIPT::Fox
+            - TEST_SCRIPT::FuboTV
+            - TEST_SCRIPT::KBSAmerican
+            - TEST_SCRIPT::Max
+            - TEST_SCRIPT::Paramount+
+            - TEST_SCRIPT::PeacockTV
+            - TEST_SCRIPT::PlutoTV
+            - TEST_SCRIPT::STARZ
+            - TEST_SCRIPT::Shudder
+            - TEST_SCRIPT::SlingTV
+            - TEST_SCRIPT::Star+
+            - TEST_SCRIPT::TLCGO
+            - TEST_SCRIPT::Discovery+
+            - TEST_SCRIPT::Espn+
+            - TEST_SCRIPT::HBOMax
+output:
+    chartPreset: default
+    fonts:
+        - https://raw.githubusercontent.com/chengda/popular-fonts/master/微软雅黑.ttf
+    emojis:
+        - https://github.com/twitter/twemoji/archive/refs/tags/v13.1.0.zip|./twemoji-13.1.0/assets/72x72/
+    watermark: Kitty Speed
+    pingColorScheme:
+        0: 236,253,245
+        10: 209,250,229
+        50: 153,226,180
+        300: 52,211,153
+        600: 5,150,105
+    speedColorScheme:
+        0: 250, 224, 228
+        12800: 247, 202, 208
+        25600: 249, 190, 199
+        51200: 255, 133, 161
+        102400: 255, 112, 150
+        153600: 255, 92, 138
+        204800: 255, 71, 126
+        256000: 255, 10, 84
+    outputReportAsImage: true
+scripts:
+    4GTV:
+        type: media
+        content: ./scripts/hmt/4GTV.js
+        rank: 213
+    7plus:
+        type: media
+        content: ./scripts/oa/7plus.js
+        rank: 715
+    ABC:
+        type: media
+        content: ./scripts/us/ABC.js
+        rank: 327
+    ABCiView:
+        type: media
+        content: ./scripts/oa/ABCiView.js
+        rank: 712
+    AETV:
+        type: media
+        content: ./scripts/us/AETV.js
+        rank: 318
+    Abema:
+        type: media
+        content: ./scripts/jp/abema.js
+        rank: 402
+    AcornTV:
+        type: media
+        content: ./scripts/us/AcornTV.js
+        rank: 330
+    Amediateka:
+        type: media
+        content: ./scripts/eu/Amediateka.js
+        rank: 611
+    AnimeFesta:
+        type: media
+        content: ./scripts/jp/AnimeFesta.js
+        rank: 424
+    BBCiPlayer:
+        type: media
+        content: ./scripts/eu/bbciplayer.js
+        rank: 602
+    BeinConnect:
+        type: media
+        content: ./scripts/asia/BeinConnect.js
+        rank: 803
+    Biguz:
+        type: media
+        content: ./scripts/other/Biguz.js
+        rank: 1003
+    BiliBili:
+        type: media
+        content: ./scripts/hmt/bilibili.js
+        rank: 208
+    BiliBiliTV:
+        type: media
+        content: ./scripts/cbs/biliintl.js
+        rank: 107
+    Binge:
+        type: media
+        content: ./scripts/oa/Binge.js
+        rank: 711
+    BritBox:
+        type: media
+        content: ./scripts/us/Britbox.js
+        rank: 302
+    CBCGem:
+        type: media
+        content: ./scripts/us/CBCGem.js
+        rank: 328
+    CWTV:
+        type: media
+        content: ./scripts/us/CWTV.js
+        rank: 323
+    Canal+:
+        type: media
+        content: ./scripts/eu/Canal+.js
+        rank: 603
+    CatchPlay+:
+        type: media
+        content: ./scripts/hmt/catchplay.js
+        rank: 205
+    Channel4:
+        type: media
+        content: ./scripts/eu/Channel4.js
+        rank: 604
+    Channel5:
+        type: media
+        content: ./scripts/eu/Channel5.js
+        rank: 605
+    Channel9:
+        type: media
+        content: ./scripts/oa/Channel9.js
+        rank: 704
+    Channel10:
+        type: media
+        content: ./scripts/oa/Channel10.js
+        rank: 705
+    ChatGPT:
+        type: media
+        content: ./scripts/other/openai.js
+        rank: 1044
+    Claude:
+        type: media
+        content: ./scripts/other/Claude.js
+        rank: 1006
+    ClipTV:
+        type: media
+        content: ./scripts/asia/ClipTV.js
+        rank: 811
+    Copilot:
+        type: media
+        content: ./scripts/other/Copilot.js
+        rank: 1004
+    CoupangPlay:
+        type: media
+        content: ./scripts/kr/CoupangPlay.js
+        rank: 505
+    Crave:
+        type: media
+        content: ./scripts/us/Crave.js
+        rank: 329
+    Crunchyroll:
+        type: media
+        content: ./scripts/us/Crunchyroll.js
+        rank: 321
+    DMM:
+        type: media
+        content: ./scripts/jp/DMM.js
+        rank: 422
+    DNS:
+        type: media
+        content: ./scripts/other/dns.js
+        rank: 1052
+    DSTV:
+        type: media
+        content: ./scripts/asia/DSTV.js
+        rank: 813
+    Dazn:
+        type: media
+        content: ./scripts/cbs/dazn.js
+        rank: 109
+    Deezer:
+        type: media
+        content: ./scripts/eu/Deezer.js
+        rank: 621
+    Discovery+:
+        type: media
+        content: ./scripts/us/discoveryplus.js
+        rank: 303
+    Disney+:
+        type: media
+        content: ./scripts/cbs/disney.js
+        rank: 102
+        onStats: true
+    Docplay:
+        type: media
+        content: ./scripts/oa/Docplay.js
+        rank: 703
+    E-Hentai:
+        type: media
+        content: ./scripts/other/E-Hentai.js
+        rank: 1038
+    EPIX:
+        type: media
+        content: ./scripts/us/EPIX.js
+        rank: 322
+    Espn+:
+        type: media
+        content: ./scripts/us/espn+.js
+        rank: 304
+    Eurosport:
+        type: media
+        content: ./scripts/eu/Eurosport.js
+        rank: 622
+    FOD:
+        type: media
+        content: ./scripts/jp/fod.js
+        rank: 403
+    FXNOW:
+        type: media
+        content: ./scripts/us/FXNOW.js
+        rank: 307
+    Fox:
+        type: media
+        content: ./scripts/us/Fox.js
+        rank: 305
+    FrndlyTV:
+        type: media
+        content: ./scripts/us/FrndlyTV.js
+        rank: 333
+    FuboTV:
+        type: media
+        content: ./scripts/us/FuboTV.js
+        rank: 306
+    GalaxyPlay:
+        type: media
+        content: ./scripts/asia/GalaxyPlay.js
+        rank: 808
+    GaragePlay:
+        type: media
+        content: ./scripts/hmt/GaragePlay.js
+        rank: 215
+    Gemini:
+        type: media
+        content: ./scripts/other/Gemini.js
+        rank: 1005
+    GimyTV:
+        type: media
+        content: ./scripts/hmt/GimyTV.js
+        rank: 218
+    HBOGoAisa:
+        type: media
+        content: ./scripts/hmt/hboGoAisa.js
+        rank: 206
+    HBOMax:
+        type: media
+        content: ./scripts/us/hbomax.js
+        rank: 308
+    HamiVideo:
+        type: media
+        content: ./scripts/hmt/HamiVideo.js
+        rank: 204
+    Hanime1:
+        type: media
+        content: ./scripts/other/hanime1.js
+        rank: 1002
+    Hotstar:
+        type: media
+        content: ./scripts/cbs/Hotstar.js
+        rank: 111
+    HoyTV:
+        type: media
+        content: ./scripts/hmt/HoyTV.js
+        rank: 217
+    HuluJP:
+        type: media
+        content: ./scripts/jp/hulujp.js
+        rank: 404
+    IP类型:
+        type: media
+        content: ./scripts/other/iptype.js
+        rank: 1050
+    IP风险:
+        type: media
+        content: ./scripts/other/iprisk.js
+        rank: 1051
+    ITVHub:
+        type: media
+        content: ./scripts/eu/ITVHub.js
+        rank: 614
+    InstagramMusic:
+        type: media
+        content: ./scripts/other/InstagramMusic.js
+        rank: 1039
+    J:COM.on.demand:
+        type: media
+        content: ./scripts/jp/J_COM_ON_DEMAND.js
+        rank: 405
+    JioCinema:
+        type: media
+        content: ./scripts/asia/JioCinema.js
+        rank: 812
+    Joyn:
+        type: media
+        content: ./scripts/eu/Joyn.js
+        rank: 609
+    K+:
+        type: media
+        content: ./scripts/asia/K+.js
+        rank: 809
+    KBSAmerican:
+        type: media
+        content: ./scripts/us/KBSAmerican.js
+        rank: 310
+    KBSDomestic:
+        type: media
+        content: ./scripts/kr/KBSDomestic.js
+        rank: 502
+    KKTV:
+        type: media
+        content: ./scripts/hmt/kktv.js
+        rank: 202
+    KOCOWA:
+        type: media
+        content: ./scripts/us/KOCOWA.js
+        rank: 320
+    KakaoWebtoon:
+        type: media
+        content: ./scripts/hmt/KakaoWebtoon.js
+        rank: 216
+    Karaoke:
+        type: media
+        content: ./scripts/jp/Karaoke.js
+        rank: 407
+    Kayo:
+        type: media
+        content: ./scripts/oa/Kayo.js
+        rank: 714
+    Lemino:
+        type: media
+        content: ./scripts/jp/Lemino.js
+        rank: 421
+    LiTV:
+        type: media
+        content: ./scripts/hmt/liTV.js
+        rank: 210
+    LineTV:
+        type: media
+        content: ./scripts/hmt/LineTV.js
+        rank: 209
+    MXPlayer:
+        type: media
+        content: ./scripts/asia/MXPlayer.js
+        rank: 807
+    MYTV:
+        type: media
+        content: ./scripts/asia/MYTV.js
+        rank: 810
+    MaoriTV:
+        type: media
+        content: ./scripts/oa/MaoriTV.js
+        rank: 713
+    Max:
+        type: media
+        content: ./scripts/us/Max.js
+        rank: 309
+    MeWatch:
+        type: media
+        content: ./scripts/asia/MeWatch.js
+        rank: 804
+    MolaTV:
+        type: media
+        content: ./scripts/asia/MolaTV.js
+        rank: 802
+    Molotov:
+        type: media
+        content: ./scripts/eu/Molotov.js
+        rank: 606
+    MoviStarPlus+:
+        type: media
+        content: ./scripts/eu/MoviStarPlus+.js
+        rank: 617
+    MusicJP:
+        type: media
+        content: ./scripts/jp/MusicJP.js
+        rank: 409
+    MyTVSuper:
+        type: media
+        content: ./scripts/hmt/mytvsuper.js
+        rank: 211
+    MyVideo:
+        type: media
+        content: ./scripts/hmt/myvideo.js
+        rank: 207
+    NBATV:
+        type: media
+        content: ./scripts/us/NBATV.js
+        rank: 332
+    NBCTV:
+        type: media
+        content: ./scripts/us/NBCTV.js
+        rank: 336
+    NFL+:
+        type: media
+        content: ./scripts/us/NFL+.js
+        rank: 319
+    NHK+:
+        type: media
+        content: ./scripts/jp/NHK+.js
+        rank: 417
+    NPOStartPlus:
+        type: media
+        content: ./scripts/eu/NPOStartPlus.js
+        rank: 616
+    NaverTV:
+        type: media
+        content: ./scripts/kr/NaverTV.js
+        rank: 506
+    Netflix:
+        type: media
+        content: ./scripts/cbs/netflix.js
+        rank: 103
+        onStats: true
+    Niconico:
+        type: media
+        content: ./scripts/jp/niconico.js
+        rank: 410
+    NowE:
+        type: media
+        content: ./scripts/hmt/NowE.js
+        rank: 214
+    OfferUp:
+        type: media
+        content: ./scripts/us/OfferUp.js
+        rank: 335
+    OptusSports:
+        type: media
+        content: ./scripts/oa/OptusSports.js
+        rank: 706
+    Paramount+:
+        type: media
+        content: ./scripts/us/Paramount+.js
+        rank: 311
+    PeacockTV:
+        type: media
+        content: ./scripts/us/PeacockTV.js
+        rank: 312
+    Perplexity:
+        type: media
+        content: ./scripts/other/Perplexity.js
+        rank: 1007
+    Philo:
+        type: media
+        content: ./scripts/us/Philo.js
+        rank: 324
+    PlutoTV:
+        type: media
+        content: ./scripts/us/PlutoTV.js
+        rank: 313
+    Popcornflix:
+        type: media
+        content: ./scripts/us/Popcornflix.js
+        rank: 326
+    PrimeVideo:
+        type: media
+        content: ./scripts/cbs/primevideo.js
+        rank: 105
+    RTL+:
+        type: media
+        content: ./scripts/eu/RTL+.js
+        rank: 620
+    Radiko:
+        type: media
+        content: ./scripts/jp/Radiko.js
+        rank: 413
+    RaiPlay:
+        type: media
+        content: ./scripts/eu/RaiPlay.js
+        rank: 610
+    RakutenTV:
+        type: media
+        content: ./scripts/eu/RakutenTV.js
+        rank: 613
+    Reddit:
+        type: media
+        content: ./scripts/other/Reddit.js
+        rank: 1040
+    SBSonDemand:
+        type: media
+        content: ./scripts/oa/SBSonDemand.js
+        rank: 707
+    SSH:
+        type: media
+        content: ./scripts/other/ssh.js
+        rank: 1045
+    STARZ:
+        type: media
+        content: ./scripts/us/STARZ.js
+        rank: 316
+    Setanta:
+        type: media
+        content: ./scripts/eu/Setanta.js
+        rank: 619
+    Showmax:
+        type: media
+        content: ./scripts/asia/Showmax.js
+        rank: 814
+    Shudder:
+        type: media
+        content: ./scripts/us/Shudder.js
+        rank: 314
+    SkyCH:
+        type: media
+        content: ./scripts/eu/SkyCH.js
+        rank: 618
+    SkyDE:
+        type: media
+        content: ./scripts/eu/SkyDE.js
+        rank: 608
+    SkyGO:
+        type: media
+        content: ./scripts/eu/SkyGO.js
+        rank: 607
+    SkyGoNZ:
+        type: media
+        content: ./scripts/oa/SkyGoNZ.js
+        rank: 708
+    SkyShowTime:
+        type: media
+        content: ./scripts/eu/SkyShowTime.js
+        rank: 623
+    SlingTV:
+        type: media
+        content: ./scripts/us/SlingTV.js
+        rank: 315
+    SpeedTest:
+        type: media
+        content: ./scripts/other/SpeedTest.js
+        rank: 1046
+    Spotify:
+        type: media
+        content: ./scripts/other/spotify.js
+        rank: 1041
+    SpotvNow:
+        type: media
+        content: ./scripts/kr/SpotvNow.js
+        rank: 508
+    Stan:
+        type: media
+        content: ./scripts/oa/Stan.js
+        rank: 702
+    Star+:
+        type: media
+        content: ./scripts/us/Star+.js
+        rank: 331
+    StarHub:
+        type: media
+        content: ./scripts/hmt/StarHub.js
+        rank: 212
+    Steam:
+        type: media
+        content: ./scripts/other/steam.js
+        rank: 1043
+    TLCGO:
+        type: media
+        content: ./scripts/us/TLCGO.js
+        rank: 317
+    TVBAnywhere:
+        type: media
+        content: ./scripts/cbs/tvb.js
+        rank: 106
+    TVer:
+        type: media
+        content: ./scripts/jp/TVer.js
+        rank: 415
+    TataPlay:
+        type: media
+        content: ./scripts/asia/TataPlay.js
+        rank: 806
+    Telasa:
+        type: media
+        content: ./scripts/jp/Telasa.js
+        rank: 414
+    Telegram延迟:
+        type: media
+        content: ./scripts/other/tgping.js
+        rank: 1049
+    ThreeNow:
+        type: media
+        content: ./scripts/oa/ThreeNow.js
+        rank: 710
+    Tiktok:
+        type: media
+        content: ./scripts/other/tiktok.js
+        rank: 1042
+    TubiTV:
+        type: media
+        content: ./scripts/us/TubiTV.js
+        rank: 325
+    Tving:
+        type: media
+        content: ./scripts/kr/tving.js
+        rank: 503
+    UNext:
+        type: media
+        content: ./scripts/jp/UNext.js
+        rank: 418
+    VideoLand:
+        type: media
+        content: ./scripts/eu/VideoLand.js
+        rank: 615
+    VideoMarket:
+        type: media
+        content: ./scripts/jp/VideoMarket.js
+        rank: 419
+    Vidio:
+        type: media
+        content: ./scripts/asia/Vidio.js
+        rank: 805
+    Viu:
+        type: media
+        content: ./scripts/cbs/viu.js
+        rank: 108
+    ViuTV:
+        type: media
+        content: ./scripts/hmt/ViuTV.js
+        rank: 219
+    Vudu:
+        type: media
+        content: ./scripts/us/Vudu.js
+        rank: 334
+    WOWOW:
+        type: media
+        content: ./scripts/jp/WOWOW.js
+        rank: 416
+    Watcha:
+        type: media
+        content: ./scripts/kr/Watcha.js
+        rank: 507
+    Wavve:
+        type: media
+        content: ./scripts/kr/Wavve.js
+        rank: 504
+    Youtube:
+        type: media
+        content: ./scripts/cbs/youtube.js
+        rank: 104
+        onStats: true
+    ZDF:
+        type: media
+        content: ./scripts/eu/ZDF.js
+        rank: 612
+    dAnimestore:
+        type: media
+        content: ./scripts/jp/dAnimestore.js
+        rank: 423
+    iQiyi:
+        type: media
+        content: ./scripts/cbs/iqiyi.js
+        rank: 110
+    世界计划:
+        type: media
+        content: ./scripts/jp/ProjectSekai.js
+        rank: 412
+    为美好的世界献上祝福:
+        type: media
+        content: ./scripts/jp/KonosubaFD.js
+        rank: 408
+    公主连结:
+        type: media
+        content: ./scripts/jp/pcr.js
+        rank: 411
+    其他流媒体:
+        type: media
+        content: ./scripts/empty.js
+        rank: 1001
+    动画疯:
+        type: media
+        content: ./scripts/hmt/bahamut.js
+        rank: 203
+    大洋洲流媒体:
+        type: media
+        content: ./scripts/empty.js
+        rank: 701
+    日本流媒体:
+        type: media
+        content: ./scripts/empty.js
+        rank: 401
+    欧洲流媒体:
+        type: media
+        content: ./scripts/empty.js
+        rank: 601
+    港澳台流媒体:
+        type: media
+        content: ./scripts/empty.js
+        rank: 201
+    维基百科:
+        type: media
+        content: ./scripts/other/wikipedia.js
+        rank: 1047
+    维基百科(中文):
+        type: media
+        content: ./scripts/other/wikipedia_zh.js
+        rank: 1048
+    美国流媒体:
+        type: media
+        content: ./scripts/empty.js
+        rank: 301
+    舰队收藏:
+        type: media
+        content: ./scripts/jp/Kancolle.js
+        rank: 406
+    西亚东南亚流媒体:
+        type: media
+        content: ./scripts/empty.js
+        rank: 801
+    赛马娘:
+        type: media
+        content: ./scripts/jp/赛马娘.js
+        rank: 420
+    跨国流媒体:
+        type: media
+        content: ./scripts/empty.js
+        rank: 101
+    韩国流媒体:
+        type: media
+        content: ./scripts/empty.js
+        rank: 501
+subconverter: ""
+errorReport: false
+minCronInterval: 10
+maxKeepHistory: 5
+keeperOnlyMode: true
+avoidJoinGroups: true
+relayBotMessagesUrl: ""
+doNotShowMiaokoAds: true
+allowKeeperToInviteToCreate: true
+callbacks:
+    onPermission: ""
+    onResponse: ""
+    onPreSend: ""
+overridedUA: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36 Edg/115.0.0.0
+enableScriptChangeWatch: true
