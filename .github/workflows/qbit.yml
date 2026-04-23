@@ -5,7 +5,6 @@ on:
 
 env:
   QBT_VERSION: "4.3.9"
-  QBT_TAG: "release-4.3.9"
   LIBTORRENT_VERSION: "1.2.20"
   LIBTORRENT_TAG: "v1.2.20"
 
@@ -22,7 +21,7 @@ jobs:
             runner: ubuntu-22.04-arm
 
     runs-on: ${{ matrix.runner }}
-    name: ${{ matrix.name }}-qt5
+    name: ${{ matrix.name }}-qbittorrent-nox
 
     steps:
       - name: Update APT
@@ -36,7 +35,7 @@ jobs:
             libboost-dev libboost-system-dev libboost-chrono-dev libboost-random-dev \
             qtbase5-dev qttools5-dev qttools5-dev-tools libqt5svg5-dev
 
-      - name: Set Qt5 path
+      - name: Set Qt path
         run: |
           echo "Qt5_DIR=/usr/lib/x86_64-linux-gnu/cmake/Qt5" >> $GITHUB_ENV
           echo "CMAKE_PREFIX_PATH=/usr/lib/x86_64-linux-gnu/cmake" >> $GITHUB_ENV
@@ -63,19 +62,11 @@ jobs:
           cmake --build build --parallel $(nproc)
           cmake --install build
 
-      - name: Clone qBittorrent
+      - name: Clone qBittorrent (fork)
         uses: actions/checkout@v4
         with:
-          repository: qbittorrent/qBittorrent
-          ref: ${{ env.QBT_TAG }}
+          repository: qiuxiuya/qBittorrent
           path: qbittorrent
-
-      - name: Replace webui file
-        run: |
-          curl -fsSL https://raw.githubusercontent.com/qbittorrent/qBittorrent/master/src/webui/webapplication.cpp \
-            -o qbittorrent/src/webui/webapplication.cpp
-          curl -fsSL https://raw.githubusercontent.com/qbittorrent/qBittorrent/master/src/webui/webapplication.h \
-            -o qbittorrent/src/webui/webapplication.h
 
       - name: Configure qBittorrent
         working-directory: qbittorrent
@@ -100,7 +91,7 @@ jobs:
           strip "$BIN" || true
           cp "$BIN" "artifacts/${{ matrix.name }}-qbittorrent-nox"
 
-      - name: Upload
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}-qbittorrent-nox
