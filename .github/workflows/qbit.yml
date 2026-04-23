@@ -2,8 +2,6 @@ name: Build qBittorrent 4.3.9 Multi-Platform
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ main ]
 
 env:
   QBT_VERSION: "4.3.9"
@@ -13,151 +11,50 @@ env:
 
 jobs:
   build:
-    name: ${{ matrix.platform.name }}-${{ matrix.qt.suffix }}
-    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
-        platform:
+        include:
           - name: x86_64
-            arch: x86_64
-            triplet: x86_64-linux-gnu
-            apt_arch: amd64
-            cross: false
-
-          - name: x86
-            arch: i686
-            triplet: i686-linux-gnu
-            apt_arch: i386
-            cross: true
-
-          - name: aarch64
-            arch: aarch64
-            triplet: aarch64-linux-gnu
-            apt_arch: arm64
-            cross: true
-
-          - name: armhf
-            arch: arm
-            triplet: arm-linux-gnueabihf
-            apt_arch: armhf
-            cross: true
-
-          - name: armv7
-            arch: armv7
-            triplet: arm-linux-gnueabihf
-            apt_arch: armhf
-            cross: true
-
-        qt:
-          - suffix: qbittorrent-nox
+            runner: ubuntu-22.04
+            qt_suffix: qbittorrent-nox
             qt_version: "6"
             qt_packages: "qt6-base-dev qt6-tools-dev qt6-tools-dev-tools libqt6svg6-dev"
+            qt_prefix: "/usr/lib/x86_64-linux-gnu/cmake"
 
-          - suffix: qt5-qbittorrent-nox
+          - name: x86_64
+            runner: ubuntu-22.04
+            qt_suffix: qt5-qbittorrent-nox
             qt_version: "5"
             qt_packages: "qtbase5-dev qttools5-dev qttools5-dev-tools libqt5svg5-dev"
+            qt_prefix: "/usr/lib/x86_64-linux-gnu/cmake"
 
-        exclude:
-          # armv7 和 armhf 共用同一 triplet，Qt6 在 armhf 交叉编译支持有限
-          - platform:
-              name: armv7
-            qt:
-              qt_version: "6"
+          - name: arm64
+            runner: ubuntu-22.04-arm
+            qt_suffix: qbittorrent-nox
+            qt_version: "6"
+            qt_packages: "qt6-base-dev qt6-tools-dev qt6-tools-dev-tools libqt6svg6-dev"
+            qt_prefix: "/usr/lib/aarch64-linux-gnu/cmake"
+
+    runs-on: ${{ matrix.runner }}
+    name: ${{ matrix.name }}-${{ matrix.qt_suffix }}
 
     steps:
-      # ── 配置多架构 APT ────────────────────────────────────────────────────────
-      - name: Setup multi-arch APT
-        if: matrix.platform.cross == true
-        run: |
-          sudo dpkg --add-architecture ${{ matrix.platform.apt_arch }}
-          sudo sed -i 's/^deb /deb [arch=amd64] /' /etc/apt/sources.list
-          # 为目标架构添加 ports 源
-          ARCH="${{ matrix.platform.apt_arch }}"
-          if [ "$ARCH" = "i386" ]; then
-            echo "deb [arch=i386] http://archive.ubuntu.com/ubuntu jammy main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
-            echo "deb [arch=i386] http://archive.ubuntu.com/ubuntu jammy-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
-          else
-            echo "deb [arch=${ARCH}] http://ports.ubuntu.com/ubuntu-ports jammy main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
-            echo "deb [arch=${ARCH}] http://ports.ubuntu.com/ubuntu-ports jammy-updates main restricted universe multiverse" | sudo tee -a /etc/apt/sources.list
-          fi
-          sudo apt-get update -qq
-
-      - name: Update APT (native)
-        if: matrix.platform.cross == false
+      - name: Update APT
         run: sudo apt-get update -qq
 
-      # ── 安装交叉编译工具链 ────────────────────────────────────────────────────
-      - name: Install cross-compilation toolchain
-        if: matrix.platform.cross == true
-        run: |
-          TRIPLET="${{ matrix.platform.triplet }}"
-          sudo apt-get install -y \
-            crossbuild-essential-${{ matrix.platform.apt_arch }} \
-            gcc-${TRIPLET} \
-            g++-${TRIPLET} \
-            binutils-${TRIPLET} || true
-
-      # ── 安装通用构建依赖（主机侧）────────────────────────────────────────────
-      - name: Install host build tools
+      - name: Install dependencies
         run: |
           sudo apt-get install -y \
-            cmake \
-            ninja-build \
-            git \
-            curl \
-            pkg-config \
-            python3
+            cmake ninja-build git curl pkg-config python3 \
+            libssl-dev zlib1g-dev \
+            libboost-dev libboost-system-dev libboost-chrono-dev libboost-random-dev \
+            ${{ matrix.qt_packages }}
 
-      # ── 安装目标架构依赖库 ────────────────────────────────────────────────────
-      - name: Install target libraries
-        run: |
-          ARCH="${{ matrix.platform.apt_arch }}"
-          QT_PKGS="${{ matrix.qt.qt_packages }}"
-          # 为目标架构安装带 arch 后缀的包
-          CROSS_PKGS=$(echo "$QT_PKGS" | tr ' ' '\n' | sed "s/$/:${ARCH}/" | tr '\n' ' ')
-          sudo apt-get install -y \
-            libssl-dev:${ARCH} \
-            zlib1g-dev:${ARCH} \
-            libboost-dev:${ARCH} \
-            libboost-system-dev:${ARCH} \
-            libboost-chrono-dev:${ARCH} \
-            libboost-random-dev:${ARCH} \
-            ${CROSS_PKGS} || true
-          # 如果交叉包安装失败，退回到主机包（用于 x86_64 native）
-          if [ "${{ matrix.platform.cross }}" = "false" ]; then
-            sudo apt-get install -y $QT_PKGS libssl-dev zlib1g-dev \
-              libboost-dev libboost-system-dev libboost-chrono-dev libboost-random-dev
-          fi
+      - name: Fix Qt CMake path
+        run: echo "CMAKE_PREFIX_PATH=${{ matrix.qt_prefix }}" >> $GITHUB_ENV
 
-      # ── 设置交叉编译环境变量 ──────────────────────────────────────────────────
-      - name: Set cross-compilation environment
-        id: cross_env
-        run: |
-          TRIPLET="${{ matrix.platform.triplet }}"
-          ARCH="${{ matrix.platform.apt_arch }}"
-          if [ "${{ matrix.platform.cross }}" = "true" ]; then
-            echo "CC=${TRIPLET}-gcc" >> $GITHUB_ENV
-            echo "CXX=${TRIPLET}-g++" >> $GITHUB_ENV
-            echo "AR=${TRIPLET}-ar" >> $GITHUB_ENV
-            echo "STRIP=${TRIPLET}-strip" >> $GITHUB_ENV
-            echo "CMAKE_TOOLCHAIN=-DCMAKE_SYSTEM_NAME=Linux \
-              -DCMAKE_SYSTEM_PROCESSOR=${{ matrix.platform.arch }} \
-              -DCMAKE_C_COMPILER=${TRIPLET}-gcc \
-              -DCMAKE_CXX_COMPILER=${TRIPLET}-g++ \
-              -DCMAKE_FIND_ROOT_PATH=/usr/${TRIPLET} \
-              -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER \
-              -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=BOTH \
-              -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=BOTH" >> $GITHUB_ENV
-          else
-            echo "CC=gcc" >> $GITHUB_ENV
-            echo "CXX=g++" >> $GITHUB_ENV
-            echo "STRIP=strip" >> $GITHUB_ENV
-            echo "CMAKE_TOOLCHAIN=" >> $GITHUB_ENV
-          fi
-
-      # ── Clone & 编译 libtorrent 1.2.20 ───────────────────────────────────────
-      - name: Clone libtorrent ${{ env.LIBTORRENT_VERSION }}
+      - name: Clone libtorrent
         uses: actions/checkout@v4
         with:
           repository: arvidn/libtorrent
@@ -169,7 +66,6 @@ jobs:
         working-directory: libtorrent
         run: |
           cmake -B build -G Ninja \
-            ${{ env.CMAKE_TOOLCHAIN }} \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/sysroot \
             -Dpython-bindings=OFF \
@@ -180,106 +76,45 @@ jobs:
           cmake --build build --parallel $(nproc)
           cmake --install build
 
-      # ── Clone qBittorrent 4.3.9 ───────────────────────────────────────────────
-      - name: Clone qBittorrent ${{ env.QBT_VERSION }}
+      - name: Clone qBittorrent
         uses: actions/checkout@v4
         with:
           repository: qbittorrent/qBittorrent
           ref: ${{ env.QBT_TAG }}
           path: qbittorrent
 
-      # ── 替换 webapplication.cpp/h 为最新版本 ─────────────────────────────────
-      - name: Replace webapplication.cpp with latest master
+      - name: Replace webapplication
         run: |
-          echo ">> Fetching latest src/webui/webapplication.cpp from master..."
-          curl -fsSL \
-            "https://raw.githubusercontent.com/qbittorrent/qBittorrent/master/src/webui/webapplication.cpp" \
+          curl -fsSL https://raw.githubusercontent.com/qbittorrent/qBittorrent/master/src/webui/webapplication.cpp \
             -o qbittorrent/src/webui/webapplication.cpp
-          echo ">> Fetching latest src/webui/webapplication.h from master..."
-          curl -fsSL \
-            "https://raw.githubusercontent.com/qbittorrent/qBittorrent/master/src/webui/webapplication.h" \
+          curl -fsSL https://raw.githubusercontent.com/qbittorrent/qBittorrent/master/src/webui/webapplication.h \
             -o qbittorrent/src/webui/webapplication.h
-          echo "Done. First 5 lines of replaced file:"
-          head -5 qbittorrent/src/webui/webapplication.cpp
 
-      # ── 配置 Qt 版本 ──────────────────────────────────────────────────────────
-      - name: Set Qt cmake option
-        id: qt_opt
-        run: |
-          if [ "${{ matrix.qt.qt_version }}" = "6" ]; then
-            echo "opt=-DQT6=ON" >> $GITHUB_OUTPUT
-          else
-            echo "opt=-DQT6=OFF" >> $GITHUB_OUTPUT
-          fi
-
-      # ── 编译 qBittorrent ──────────────────────────────────────────────────────
       - name: Configure qBittorrent
         working-directory: qbittorrent
         run: |
           cmake -B build -G Ninja \
-            ${{ env.CMAKE_TOOLCHAIN }} \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/dist \
-            -DCMAKE_PREFIX_PATH=${{ github.workspace }}/sysroot \
-            ${{ steps.qt_opt.outputs.opt }} \
+            -DCMAKE_PREFIX_PATH="${{ env.CMAKE_PREFIX_PATH }};${{ github.workspace }}/sysroot" \
+            -DQT6=${{ matrix.qt_version == '6' && 'ON' || 'OFF' }} \
             -DSTACKTRACE=OFF \
             -DWEBUI=ON \
             -DGUI=OFF
 
-      - name: Build qBittorrent
+      - name: Build
         working-directory: qbittorrent
         run: cmake --build build --parallel $(nproc)
 
-      # ── Strip & 重命名产物 ────────────────────────────────────────────────────
-      - name: Collect and rename binary
+      - name: Collect binary
         run: |
           mkdir -p artifacts
-          BIN=$(find qbittorrent/build -maxdepth 4 -name "qbittorrent-nox" -o -name "qbittorrentnoX" 2>/dev/null | head -1)
-          if [ -z "$BIN" ]; then
-            echo "ERROR: binary not found"; find qbittorrent/build -type f; exit 1
-          fi
-          ${{ env.STRIP }} "$BIN" || true
-          OUTNAME="${{ matrix.platform.name }}-${{ matrix.qt.suffix }}"
-          cp "$BIN" "artifacts/${OUTNAME}"
-          echo "Binary: artifacts/${OUTNAME} ($(du -sh artifacts/${OUTNAME} | cut -f1))"
+          BIN=$(find qbittorrent/build -type f -name "qbittorrent-nox" | head -1)
+          strip "$BIN" || true
+          cp "$BIN" "artifacts/${{ matrix.name }}-${{ matrix.qt_suffix }}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.platform.name }}-${{ matrix.qt.suffix }}
+          name: ${{ matrix.name }}-${{ matrix.qt_suffix }}
           path: artifacts/
-          retention-days: 30
-
-  # ── 汇总所有平台产物 + 生成 dependency-version.json ──────────────────────────
-  release:
-    name: Merge artifacts
-    needs: build
-    runs-on: ubuntu-22.04
-    if: always()
-
-    steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: release/
-          merge-multiple: true
-
-      - name: Generate dependency-version.json
-        run: |
-          cat > release/dependency-version.json <<EOF
-          {
-            "qbittorrent": "${{ env.QBT_VERSION }}",
-            "libtorrent":  "${{ env.LIBTORRENT_VERSION }}",
-            "webapplication_cpp": "latest-master",
-            "built_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          }
-          EOF
-          echo "=== Artifacts ==="
-          ls -lh release/
-
-      - name: Upload combined release
-        uses: actions/upload-artifact@v4
-        with:
-          name: qbittorrent-${{ env.QBT_VERSION }}-lt${{ env.LIBTORRENT_VERSION }}-all-platforms
-          path: release/
-          retention-days: 30
