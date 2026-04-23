@@ -1,0 +1,136 @@
+name: Build qBittorrent 4.3.9 + libtorrent 1.2.20 (latest webapplication.cpp)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+env:
+  QBT_VERSION: "4.3.9"
+  LIBTORRENT_VERSION: "1.2.20"
+  QBT_TAG: "release-4.3.9"
+  LIBTORRENT_TAG: "libtorrent-1.2.20"
+
+jobs:
+  build:
+    name: Build on Ubuntu
+    runs-on: ubuntu-20.04
+
+    steps:
+      # ── 1. 安装依赖 ──────────────────────────────────────────────────────────
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            git \
+            libssl-dev \
+            libgeoip-dev \
+            zlib1g-dev \
+            libboost-dev \
+            libboost-system-dev \
+            libboost-chrono-dev \
+            libboost-random-dev \
+            qtbase5-dev \
+            qttools5-dev \
+            qttools5-dev-tools \
+            libqt5svg5-dev \
+            pkg-config \
+            ninja-build
+
+      # ── 2. 编译 libtorrent 1.2.20 ────────────────────────────────────────────
+      - name: Clone libtorrent ${{ env.LIBTORRENT_VERSION }}
+        uses: actions/checkout@v4
+        with:
+          repository: arvidn/libtorrent
+          ref: ${{ env.LIBTORRENT_TAG }}
+          path: libtorrent
+          submodules: recursive
+
+      - name: Build libtorrent
+        working-directory: libtorrent
+        run: |
+          cmake -B build \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/usr/local \
+            -Dpython-bindings=OFF \
+            -Dexamples=OFF \
+            -Dtests=OFF \
+            -DBUILD_SHARED_LIBS=OFF
+          cmake --build build --parallel $(nproc)
+          sudo cmake --install build
+
+      # ── 3. Checkout qBittorrent 4.3.9 ────────────────────────────────────────
+      - name: Clone qBittorrent ${{ env.QBT_VERSION }}
+        uses: actions/checkout@v4
+        with:
+          repository: qbittorrent/qBittorrent
+          ref: ${{ env.QBT_TAG }}
+          path: qbittorrent
+
+      # ── 4. 替换 webapplication.cpp 为最新版本 ──────────────────────────────
+      - name: Fetch latest webapplication.cpp from master
+        run: |
+          echo "Downloading latest src/webui/webapplication.cpp from master branch..."
+          curl -fsSL \
+            "https://raw.githubusercontent.com/qbittorrent/qBittorrent/master/src/webui/webapplication.cpp" \
+            -o qbittorrent/src/webui/webapplication.cpp
+          echo "File replaced successfully."
+          echo "--- HEAD of replaced file ---"
+          head -30 qbittorrent/src/webui/webapplication.cpp
+
+      # ── 5. 同步对应的头文件（可选，建议保持一致）────────────────────────────
+      - name: Fetch latest webapplication.h from master
+        run: |
+          curl -fsSL \
+            "https://raw.githubusercontent.com/qbittorrent/qBittorrent/master/src/webui/webapplication.h" \
+            -o qbittorrent/src/webui/webapplication.h
+          echo "Header replaced successfully."
+
+      # ── 6. 编译 qBittorrent ───────────────────────────────────────────────────
+      - name: Configure qBittorrent
+        working-directory: qbittorrent
+        run: |
+          cmake -B build \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/usr/local \
+            -DSTACKTRACE=OFF \
+            -DWEBUI=ON \
+            -DGUI=OFF \
+            -DLibtorrentRasterbar_DIR=/usr/local/lib/cmake/LibtorrentRasterbar
+
+      - name: Build qBittorrent
+        working-directory: qbittorrent
+        run: |
+          cmake --build build --parallel $(nproc)
+
+      # ── 7. 打包产物 ───────────────────────────────────────────────────────────
+      - name: Package binary
+        run: |
+          mkdir -p dist
+          cp qbittorrent/build/qbittorrent-nox dist/ 2>/dev/null || \
+          cp qbittorrent/build/qbittorrentnoX dist/ 2>/dev/null || \
+          find qbittorrent/build -maxdepth 3 -name "qbittorrent*" -type f -exec cp {} dist/ \;
+          ls -lh dist/
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: qbittorrent-${{ env.QBT_VERSION }}-lt${{ env.LIBTORRENT_VERSION }}-latest-webui
+          path: dist/
+          retention-days: 30
+
+      # ── 8. 打印版本信息（调试用）────────────────────────────────────────────
+      - name: Print version info
+        run: |
+          echo "=== Build Summary ==="
+          echo "qBittorrent version : ${{ env.QBT_VERSION }}"
+          echo "libtorrent version  : ${{ env.LIBTORRENT_VERSION }}"
+          echo "webapplication.cpp  : fetched from qBittorrent/master"
+          echo ""
+          echo "=== Binary info ==="
+          file dist/* || true
+          dist/qbittorrent-nox --version || true
