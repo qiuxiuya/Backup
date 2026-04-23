@@ -9,7 +9,7 @@ env:
   QBT_VERSION: "4.3.9"
   QBT_TAG: "release-4.3.9"
   LIBTORRENT_VERSION: "1.2.20"
-  LIBTORRENT_TAG: "libtorrent-1.2.20"
+  LIBTORRENT_TAG: "v1.2.20"
 
 jobs:
   build:
