@@ -17,27 +17,12 @@ jobs:
         include:
           - name: x86_64
             runner: ubuntu-22.04
-            qt_suffix: qbittorrent-nox
-            qt_version: "6"
-            qt_packages: "qt6-base-dev qt6-tools-dev qt6-tools-dev-tools libqt6svg6-dev"
-            qt_prefix: "/usr/lib/x86_64-linux-gnu/cmake"
-
-          - name: x86_64
-            runner: ubuntu-22.04
-            qt_suffix: qt5-qbittorrent-nox
-            qt_version: "5"
-            qt_packages: "qtbase5-dev qttools5-dev qttools5-dev-tools libqt5svg5-dev"
-            qt_prefix: "/usr/lib/x86_64-linux-gnu/cmake"
 
           - name: arm64
             runner: ubuntu-22.04-arm
-            qt_suffix: qbittorrent-nox
-            qt_version: "6"
-            qt_packages: "qt6-base-dev qt6-tools-dev qt6-tools-dev-tools libqt6svg6-dev"
-            qt_prefix: "/usr/lib/aarch64-linux-gnu/cmake"
 
     runs-on: ${{ matrix.runner }}
-    name: ${{ matrix.name }}-${{ matrix.qt_suffix }}
+    name: ${{ matrix.name }}-qt5
 
     steps:
       - name: Update APT
@@ -49,10 +34,12 @@ jobs:
             cmake ninja-build git curl pkg-config python3 \
             libssl-dev zlib1g-dev \
             libboost-dev libboost-system-dev libboost-chrono-dev libboost-random-dev \
-            ${{ matrix.qt_packages }}
+            qtbase5-dev qttools5-dev qttools5-dev-tools libqt5svg5-dev
 
-      - name: Fix Qt CMake path
-        run: echo "CMAKE_PREFIX_PATH=${{ matrix.qt_prefix }}" >> $GITHUB_ENV
+      - name: Set Qt5 path
+        run: |
+          echo "Qt5_DIR=/usr/lib/x86_64-linux-gnu/cmake/Qt5" >> $GITHUB_ENV
+          echo "CMAKE_PREFIX_PATH=/usr/lib/x86_64-linux-gnu/cmake" >> $GITHUB_ENV
 
       - name: Clone libtorrent
         uses: actions/checkout@v4
@@ -83,7 +70,7 @@ jobs:
           ref: ${{ env.QBT_TAG }}
           path: qbittorrent
 
-      - name: Replace webapplication
+      - name: Replace webui file
         run: |
           curl -fsSL https://raw.githubusercontent.com/qbittorrent/qBittorrent/master/src/webui/webapplication.cpp \
             -o qbittorrent/src/webui/webapplication.cpp
@@ -97,7 +84,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/dist \
             -DCMAKE_PREFIX_PATH="${{ env.CMAKE_PREFIX_PATH }};${{ github.workspace }}/sysroot" \
-            -DQT6=${{ matrix.qt_version == '6' && 'ON' || 'OFF' }} \
+            -DQt5_DIR=${{ env.Qt5_DIR }} \
             -DSTACKTRACE=OFF \
             -DWEBUI=ON \
             -DGUI=OFF
@@ -111,10 +98,10 @@ jobs:
           mkdir -p artifacts
           BIN=$(find qbittorrent/build -type f -name "qbittorrent-nox" | head -1)
           strip "$BIN" || true
-          cp "$BIN" "artifacts/${{ matrix.name }}-${{ matrix.qt_suffix }}"
+          cp "$BIN" "artifacts/${{ matrix.name }}-qbittorrent-nox"
 
-      - name: Upload artifact
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.name }}-${{ matrix.qt_suffix }}
+          name: ${{ matrix.name }}-qbittorrent-nox
           path: artifacts/
