@@ -2,6 +2,8 @@ name: Build qBittorrent 4.3.9 Multi-Platform
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ main ]
 
 env:
   QBT_VERSION: "4.3.9"
@@ -35,7 +37,7 @@ jobs:
             libboost-dev libboost-system-dev libboost-chrono-dev libboost-random-dev \
             qtbase5-dev qttools5-dev qttools5-dev-tools libqt5svg5-dev
 
-      - name: Set Qt path
+      - name: Set Qt env
         run: |
           echo "Qt5_DIR=/usr/lib/x86_64-linux-gnu/cmake/Qt5" >> $GITHUB_ENV
           echo "CMAKE_PREFIX_PATH=/usr/lib/x86_64-linux-gnu/cmake" >> $GITHUB_ENV
@@ -62,7 +64,7 @@ jobs:
           cmake --build build --parallel $(nproc)
           cmake --install build
 
-      - name: Clone qBittorrent (fork)
+      - name: Clone qBittorrent
         uses: actions/checkout@v4
         with:
           repository: qiuxiuya/qBittorrent
@@ -78,7 +80,9 @@ jobs:
             -DQt5_DIR=${{ env.Qt5_DIR }} \
             -DSTACKTRACE=OFF \
             -DWEBUI=ON \
-            -DGUI=OFF
+            -DGUI=OFF \
+            -DWERROR=OFF \
+            -DCMAKE_CXX_FLAGS="-Wno-error=deprecated-declarations"
 
       - name: Build
         working-directory: qbittorrent
