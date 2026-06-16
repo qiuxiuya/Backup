@@ -14,12 +14,12 @@ jobs:
 
       - run: |
           git lfs install
+          git lfs track "Termark/*"
+          git add .gitattributes
 
-      - run: |
           mkdir -p Termark
           rm -rf Termark/*
 
-      - run: |
           sudo apt-get update && sudo apt-get install -y curl
 
           urls=(
@@ -35,14 +35,11 @@ jobs:
             curl -L -o "Termark/$(basename "$url")" "$url"
           done
 
+          git add Termark
+
       - run: |
           git config user.name github-actions[bot]
           git config user.email github-actions[bot]@users.noreply.github.com
 
-          git add Termark
           git commit -m "Update Termark 1.0.35" || exit 0
-
-      - run: |
-          git lfs track "Termark/*"
-          git add .gitattributes
           git push origin main
