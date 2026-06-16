@@ -1,4 +1,4 @@
-name: Fetch frp Release
+name: Fetch Termark Release
 
 on:
   workflow_dispatch:
@@ -12,21 +12,26 @@ jobs:
           ref: main
 
       - run: |
-          mkdir -p frp
-          rm -rf frp/*
+          mkdir -p Termark
+          rm -rf Termark/*
 
       - env:
-          RELEASE_TAG: v0.66.0
-          OWNER: fatedier
-          REPO: frp
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          sudo apt-get update && sudo apt-get install -y jq curl
-          api="https://api.github.com/repos/$OWNER/$REPO/releases/tags/$RELEASE_TAG"
-          assets=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" "$api" | jq -r '.assets[].browser_download_url')
-          [ -z "$assets" ] && exit 1
-          for url in $assets; do
-            curl -L -H "Authorization: Bearer $GITHUB_TOKEN" -o "frp/$(basename "$url")" "$url"
+          sudo apt-get update && sudo apt-get install -y curl
+
+          urls=(
+            "https://f.typesafe.cn/termark/Termark-1.0.35-arm64.dmg"
+            "https://f.typesafe.cn/termark/Termark-1.0.35.dmg"
+            "https://f.typesafe.cn/termark/Termark-Setup-1.0.35-x64.exe"
+            "https://f.typesafe.cn/termark/Termark-1.0.35-portable-x64.zip"
+            "https://f.typesafe.cn/termark/Termark-1.0.35.AppImage"
+            "https://f.typesafe.cn/termark/termark_1.0.35_amd64.deb"
+          )
+
+          for url in "${urls[@]}"; do
+            file="Termark/$(basename "$url")"
+            curl -L -o "$file" "$url"
           done
 
       - env:
@@ -34,6 +39,6 @@ jobs:
         run: |
           git config user.name github-actions[bot]
           git config user.email github-actions[bot]@users.noreply.github.com
-          git add frp
-          git commit -m "Update frp v0.66.0" || exit 0
+          git add Termark
+          git commit -m "Update Termark 1.0.35" || exit 0
           git push origin main
